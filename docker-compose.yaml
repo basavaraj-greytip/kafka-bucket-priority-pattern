@@ -1,0 +1,113 @@
+version: '3.8'
+
+x-zookeeper-common-env: &zookeeper-common-env
+  ZOOKEEPER_SERVERS: zookeeper-1:2888:3888;zookeeper-2:2888:3888
+
+x-kafka-common-env: &kafka-common-env
+  KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181,zookeeper-2:2181
+  KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+services:
+  zookeeper-1:
+    extends:
+      file: docker/templates.yaml
+      service: base-zookeeper
+    container_name: zookeeper-1
+    hostname: zookeeper-1
+    environment:
+      <<: *zookeeper-common-env
+      ZOOKEEPER_SERVER_ID: 1
+    networks:
+      - internal-cluster
+
+  zookeeper-2:
+    extends:
+      file: docker/templates.yaml
+      service: base-zookeeper
+    container_name: zookeeper-2
+    hostname: zookeeper-2
+    environment:
+      <<: *zookeeper-common-env
+      ZOOKEEPER_SERVER_ID: 2
+    networks:
+      - internal-cluster
+
+  kafka-1:
+    extends:
+      file: docker/templates.yaml
+      service: base-kafka
+    hostname: kafka-1
+    container_name: kafka-1
+    ports:
+      - target: 29092
+        published: 29092
+        protocol: tcp
+        mode: host
+    environment:
+      <<: *kafka-common-env
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-1:9092,EXTERNAL://localhost:29092
+      KAFKA_LISTENERS: INTERNAL://:9092,EXTERNAL://:29092
+      KAFKA_BROKER_ID: 1
+    depends_on:
+      zookeeper-1:
+        condition: service_healthy
+      zookeeper-2:
+        condition: service_healthy
+    networks:
+      - internal-cluster
+      - streaming-cluster
+
+  kafka-2:
+    extends:
+      file: docker/templates.yaml
+      service: base-kafka
+    hostname: kafka-2
+    container_name: kafka-2
+    ports:
+      - target: 29093
+        published: 29093
+        protocol: tcp
+        mode: host
+    environment:
+      <<: *kafka-common-env
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-2:9092,EXTERNAL://localhost:29093
+      KAFKA_LISTENERS: INTERNAL://:9092,EXTERNAL://:29093
+      KAFKA_BROKER_ID: 2
+    depends_on:
+      zookeeper-1:
+        condition: service_healthy
+      zookeeper-2:
+        condition: service_healthy
+    networks:
+      - internal-cluster
+      - streaming-cluster
+
+  kafka-3:
+    extends:
+      file: docker/templates.yaml
+      service: base-kafka
+    hostname: kafka-3
+    container_name: kafka-3
+    ports:
+      - target: 29094
+        published: 29094
+        protocol: tcp
+        mode: host
+    environment:
+      <<: *kafka-common-env
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-3:9092,EXTERNAL://localhost:29094
+      KAFKA_LISTENERS: INTERNAL://:9092,EXTERNAL://:29094
+      KAFKA_BROKER_ID: 3
+    depends_on:
+      zookeeper-1:
+        condition: service_healthy
+      zookeeper-2:
+        condition: service_healthy
+    networks:
+      - internal-cluster
+      - streaming-cluster
+
+networks:
+  internal-cluster:
+    internal: true
+  streaming-cluster:

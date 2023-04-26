@@ -1,0 +1,65 @@
+version: '3.8'
+
+x-common-env: &common-env
+  BOOTSTRAP_SERVERS: 'localhost:29092,localhost:29093,localhost:29094'
+
+services:
+  producers-1:
+    container_name: producers-1
+    build: producing
+    environment:
+      <<: *common-env
+      TOPIC_NAME: 'low'
+      WORKERS_NUM: 1
+      RUN_SECONDS: 20
+    network_mode: host
+
+  producers-2:
+    container_name: producers-2
+    build: producing
+    environment:
+      <<: *common-env
+      TOPIC_NAME: 'medium'
+      WORKERS_NUM: 1
+      RUN_SECONDS: 20
+    network_mode: host
+
+  producers-3:
+    container_name: producers-3
+    build: producing
+    environment:
+      <<: *common-env
+      TOPIC_NAME: 'high'
+      WORKERS_NUM: 1
+      RUN_SECONDS: 20
+    network_mode: host
+
+  consumers-1:
+    container_name: consumers-1
+    build: consuming
+    environment:
+      <<: *common-env
+      TOPIC_NAME: 'low'
+      WORKERS_NUM: 1
+      RUN_SECONDS: 60
+    network_mode: host
+
+  consumers-2:
+    container_name: consumers-2
+    build: consuming
+    environment:
+      <<: *common-env
+      TOPIC_NAME: 'medium'
+      WORKERS_NUM: 5
+      RUN_SECONDS: 60
+    network_mode: host
+
+  consumers-3:
+    container_name: consumers-3
+    build: consuming
+    environment:
+      <<: *common-env
+      TOPIC_NAME: 'high'
+      WORKERS_NUM: 20
+      RUN_SECONDS: 60
+    network_mode: host
