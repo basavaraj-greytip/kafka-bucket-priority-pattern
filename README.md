@@ -35,7 +35,8 @@ The architecture of the project is microservices, namely producers and consumers
 
 A diagram of what the pattern architecture looks like is as follows:
 
-...
+![kafka-bucket-priority drawio](https://user-images.githubusercontent.com/93226646/234657271-f550b2db-dafe-4d2d-9780-4f7530d06165.png)
+
 
 ## Getting Started
 
