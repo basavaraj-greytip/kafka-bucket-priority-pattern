@@ -37,6 +37,11 @@ A diagram of what the pattern architecture looks like is as follows:
 
 ![kafka-bucket-priority drawio](https://user-images.githubusercontent.com/93226646/234657271-f550b2db-dafe-4d2d-9780-4f7530d06165.png)
 
+Where **H**, **M** and **L** - the sizes of the most, medium and least priority queues respectively.
+And **L** < **M** < **H**.
+
+When setting the parameters for the number of consumers for each of the topics equal or close to the topic partitions number,
+the ratio of processed messages will tend to **H** : **M** : **L**.
 
 ## Getting Started
 
